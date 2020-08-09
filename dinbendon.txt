@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `order_bill` (
   `orderID` tinyint(2) unsigned zerofill NOT NULL auto_increment,
   `orderName` varchar(20) collate utf8_unicode_ci NOT NULL,
   `orderDate` date NOT NULL,
-  PRIMARY KEY  (`orderID`)
+  PRIMARY KEY (`orderID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `bendonshop`;
@@ -30,16 +30,18 @@ CREATE TABLE IF NOT EXISTS `bendonshop` (
   `shopName` varchar(20) collate utf8_unicode_ci NOT NULL,
   `shopPhone` varchar(50) collate utf8_unicode_ci default NULL,
   `shopAddr` varchar(255) collate utf8_unicode_ci default NULL,
-  PRIMARY KEY  (`shopID`)
+  PRIMARY KEY (`shopID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `shopitems`;
 CREATE TABLE IF NOT EXISTS `shopitems` (
-  FOREIGN KEY (shopID) REFERENCES bendonshop(shopID),
+  shopID tinyint(2) unsigned zerofill NOT NULL,
   `shopitemsID` tinyint(2) unsigned zerofill NOT NULL,
   `shopitemsName` varchar(20) collate utf8_unicode_ci NOT NULL,
   `shopitemsPrice` tinyint(3) unsigned NOT NULL,
-  FOREIGN KEY (orderID) REFERENCES order_bill(orderID)
+  orderID tinyint(2) unsigned zerofill NOT NULL,
+  FOREIGN KEY (shopID) REFERENCES `bendonshop`(shopID),
+  FOREIGN KEY (orderID) REFERENCES `order_bill`(orderID)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 
@@ -79,11 +81,12 @@ INSERT INTO `shopitems` (`shopID`, `shopitemsID`, `shopitemsName`, `shopitemsPri
 -- --------------------------------------------------------
 
 
-SELECT
+SELECT DISTINCT
     `shopitems`.shopID,
     `shopitems`.orderID,
     `order_bill`.orderName,
     SUM(`shopitems`.shopitemsPrice)
 FROM
     `shopitems`
-;
+JOIN order_bill ON shopitems.orderID = order_bill.orderID
+ORDER BY `shopitems`.orderID;
