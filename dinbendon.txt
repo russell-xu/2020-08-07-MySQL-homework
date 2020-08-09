@@ -1,4 +1,6 @@
-﻿create database dinbendon default character set utf8;
+﻿DROP DATABASE IF EXISTS dinbendon;
+
+create database dinbendon default character set utf8;
 
 use dinbendon;
 
@@ -14,14 +16,15 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- --------------------------------------------------------
 
 
-CREATE TABLE IF NOT EXISTS `order` (
+DROP TABLE IF EXISTS `order_bill`;
+CREATE TABLE IF NOT EXISTS `order_bill` (
   `orderID` tinyint(2) unsigned zerofill NOT NULL auto_increment,
   `orderName` varchar(20) collate utf8_unicode_ci NOT NULL,
   `orderDate` date NOT NULL,
-  `orderTotalprice` tinyint(3) unsigned NOT NULL
-  PRIMARY KEY  (`cID`)
+  PRIMARY KEY  (`orderID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `bendonshop`;
 CREATE TABLE IF NOT EXISTS `bendonshop` (
   `shopID` tinyint(2) unsigned zerofill NOT NULL auto_increment,
   `shopName` varchar(20) collate utf8_unicode_ci NOT NULL,
@@ -30,25 +33,57 @@ CREATE TABLE IF NOT EXISTS `bendonshop` (
   PRIMARY KEY  (`shopID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `shopitems`;
 CREATE TABLE IF NOT EXISTS `shopitems` (
-  `shopitemsID` tinyint(2) unsigned zerofill NOT NULL auto_increment,
+  FOREIGN KEY (shopID) REFERENCES bendonshop(shopID),
+  `shopitemsID` tinyint(2) unsigned zerofill NOT NULL,
   `shopitemsName` varchar(20) collate utf8_unicode_ci NOT NULL,
-  `shopitemsPrice` tinyint(3) unsigned NOT NULL
+  `shopitemsPrice` tinyint(3) unsigned NOT NULL,
+  FOREIGN KEY (orderID) REFERENCES order_bill(orderID)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
---
--- 列出以下資料庫的數據： `students`
---
 
-INSERT INTO `students` (`cID`, `cName`, `cSex`, `cBirthday`, `cEmail`, `cPhone`, `cAddr`) VALUES
-(01, '簡奉君', 'F', '1987-04-04', 'elven@superstar.com', '0922988876', '台北市濟洲北路12號'),
-(02, '黃靖輪', 'M', '1987-07-01', 'jinglun@superstar.com', '0918181111', '台北市敦化南路93號5樓'),
-(03, '潘四敬', 'M', '1987-08-11', 'sugie@superstar.com', '0914530768', '台北市中央路201號7樓'),
-(04, '賴勝恩', 'M', '1984-06-20', 'shane@superstar.com', '0946820035', '台北市建國路177號6樓'),
-(05, '黎楚寧', 'F', '1988-02-15', 'ivy@superstar.com', '0920981230', '台北市忠孝東路520號6樓'),
-(06, '蔡中穎', 'M', '1987-05-05', 'zhong@superstar.com', '0951983366', '台北市三民路1巷10號'),
-(07, '徐佳螢', 'F', '1985-08-30', 'lala@superstar.com', '0918123456', '台北市仁愛路100號'),
-(08, '林雨媗', 'F', '1986-12-10', 'crystal@superstar.com', '0907408965', '台北市民族路204號'),
-(09, '林心儀', 'F', '1988-12-01', 'peggy@superstar.com', '0916456723', '台北市建國北路10號'),
-(10, '王燕博', 'M', '1993-08-10', 'albert@superstar.com', '0918976588', '台北市北環路2巷80號');
+-- --------------------------------------------------------
 
+
+INSERT INTO `order_bill` (`orderID`, `orderName`, `orderDate`) VALUES
+(01, '簡奉君', '2020-08-09'),
+(02, '黃靖輪', '2020-08-09'),
+(03, '潘四敬', '2020-08-09'),
+(04, '賴勝恩', '2020-08-09'),
+(05, '黎楚寧', '2020-08-09'),
+(06, '蔡中穎', '2020-08-09'),
+(07, '徐佳螢', '2020-08-09'),
+(08, '林雨媗', '2020-08-09'),
+(09, '林心儀', '2020-08-09'),
+(10, '王燕博', '2020-08-09');
+
+INSERT INTO `bendonshop` (`shopID`, `shopName`, `shopPhone`, `shopAddr`) VALUES
+(01, '好吃早餐', '0922988876', '台北市濟洲北路12號'),
+(02, '好吃午晚餐', '0918181111', '台北市敦化南路93號5樓'),
+(03, '好吃速食', '0914530768', '台北市中央路201號7樓');
+
+INSERT INTO `shopitems` (`shopID`, `shopitemsID`, `shopitemsName`, `shopitemsPrice`, `orderID`) VALUES
+('01', '01', '火腿蛋餅', '30', '02'),
+('01', '02', '卡拉雞腿堡', '50', '05'),
+('01', '03', '伯爵紅茶', '10', '02'),
+('02', '01', '雞排咖哩飯', '80', '09'),
+('02', '02', '豬排便當', '75', '08'),
+('02', '03', '豚骨拉麵', '85', '07'),
+('02', '04', '招牌煎餃', '75', '01'),
+('03', '01', '大麥克套餐', '120', '06'),
+('03', '02', '黑牛堡套餐', '150', '07'),
+('03', '03', '快樂分享餐', '160', '03');
+
+
+-- --------------------------------------------------------
+
+
+SELECT
+    `shopitems`.shopID,
+    `shopitems`.orderID,
+    `order_bill`.orderName,
+    SUM(`shopitems`.shopitemsPrice)
+FROM
+    `shopitems`
+;
