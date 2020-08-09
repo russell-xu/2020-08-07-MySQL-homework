@@ -82,11 +82,11 @@ INSERT INTO `shopitems` (`shopID`, `shopitemsID`, `shopitemsName`, `shopitemsPri
 
 
 SELECT DISTINCT
-    `shopitems`.shopID,
-    `shopitems`.orderID,
-    `order_bill`.orderName,
-    SUM(`shopitems`.shopitemsPrice)
+    `order_bill`.orderName AS `Name`,
+    SUM(`shopitems`.shopitemsPrice) AS `Total Price`
 FROM
     `shopitems`
 JOIN order_bill ON shopitems.orderID = order_bill.orderID
+GROUP BY `order_bill`.orderName
 ORDER BY `shopitems`.orderID;
+
